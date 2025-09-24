@@ -1,5 +1,4 @@
 #!/bin/bash
-#Developed by Siarhey Novikau
 get_dom_without_dkim () {
 echo '--------------------- getting domains list without DKIM --------------------------'
 #get domains list without DKIM enabled
