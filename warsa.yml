@@ -1,0 +1,27 @@
+---
+- name: WARSA deploy
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: Put WARSA*ZIP file on target server
+    copy: src=~/Downloads/WARSA_1_1.ZIP dest=/home/WARSA_1_1.ZIP
+
+  - name: Create WARSA direcory on target server
+    shell: mkdir /home/WARSA
+
+  - name: Unzip WARSA*ZIP into WARSA direcory on target server
+    unarchive: src=/home/WARSA_1_1.ZIP dest=/home/WARSA remote_src=yes
+
+  - name: Launch warsa script
+    shell: |
+      echo "----------------------------------------------- $(date) -----------------------------------------------" >> /home/WARSA/warsa.log
+      cd /home/WARSA/
+      ./warsa -dir / | tee -a /home/WARSA/warsa.log
+      echo "----------------------------------------------- $(date) -----------------------------------------------" >> /home/WARSA/warsa.log
+
+  - name: Get the log from server
+    fetch: src=/home/WARSA/warsa.log dest=~/Downloads/WARSA_RESULTS/
+
+  - name: Remove the WARSA*** files on target server
+    shell: rm -rf /home/WARSA*
