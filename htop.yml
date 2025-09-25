@@ -1,0 +1,22 @@
+---
+- name: check and install htop
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: install htop
+    apt: name=htop state=latest
+    notify: register
+  - name: check htop
+    shell: "which htop"
+    register: whc
+    ignore_errors: True
+  - name: print binary file place
+    debug:
+      var: whc["stdout"]
+    ignore_errors: True
+
+  handlers:
+  - name: register
+    service: name=htop state=started
+    ignore_errors: True
