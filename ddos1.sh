@@ -4,20 +4,21 @@
 req () {
     read -p "Enter the time mark for search (like 9:22): " tm
     reqf="req_$(date +"%H-%M-%S_%d%m%y").txt"
-    echo "__________________________________________________________________________________________" > /tmp/$reqf
+    echo "__________________________________________________________________________________________" | tee -a /tmp/$reqf
     for i in $(ls /var/www/httpd-logs/| grep access);do echo $i; grep "$tm" /var/www/httpd-logs/$i| wc -l;done >> sites.tmp
     sed -i ':a;N;$!ba;s/.log\n/.log /g' sites.tmp
     hd="10" #top search results == 10
     cat sites.tmp | sort -k2 -nr | head -n $hd  | tee -a /tmp/$reqf
-    echo "__________________________________________________________________________________________" >> /tmp/$reqf
+    echo "__________________________________________________________________________________________" | tee -a /tmp/$reqf
     rm sites.tmp
-    echo ""
-    echo "#######################################"
+    echo "" | tee -a /tmp/$reqf
+    echo "#######################################" | tee -a /tmp/$reqf
     read -p "Enter the site log name: " site
-    echo "#######################################"
-    echo "##### $site #####" >> /tmp/$reqf
+    echo "#######################################" | tee -a /tmp/$reqf
+    echo "##### $site #####" | tee -a /tmp/$reqf
 }
 st () {
+    echo "__________________________________________________________________________________________" | tee -a /tmp/$reqf
     echo "Time search (like 10: or 12:1)"
     echo "[D/d] docker stats"
     echo "[H/h] apache/nginx total requests and memory"
@@ -27,9 +28,9 @@ st () {
     read -p "Enter the search key: " tm
     tip="10"    #Number of the TOP IPs access site == 10
     case $tm in
-	"q"|"Q") exit 0;;
-	"d"|"D") docker stats --no-stream; st;;
-	"h"|"H") service httpd status | grep "Total\|Memory"; service nginx status | grep "Tasks\|Memory";st;;
+	"q"|"Q") echo "Results file - /tmp/$reqf"; exit 0;;
+	"d"|"D") docker stats --no-stream | tee -a /tmp/$reqf; st;;
+	"h"|"H") proxy | tee -a /tmp/$reqf;st;;
     "p"|"P") php | tee -a  /tmp/$reqf; st;;
 	"RESTRICT") sed -i "s/#include belips_restrict.conf;/include belips_restrict.conf;/" /etc/nginx/tuning.conf;nginx -t && nginx -s reload; st;;
 	"UNRESTRICT") sed -i "s/include belips_restrict.conf;/#include belips_restrict.conf;/" /etc/nginx/tuning.conf; nginx -t && nginx -s reload; st;;
@@ -44,17 +45,21 @@ st () {
     esac
 }
 
+proxy () {
+echo "--- httpd:"
+service httpd status | grep "Total\|Memory"
+echo "--- nginx:"
+service nginx status | grep "Tasks\|Memory"
+}
+
 php () {
-echo "---"
 echo "PHP: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php)"
 echo "php-cgi: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php-cgi)"
 echo "lsphp: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c lsphp)"
 echo "Top 5 users:"
 ps ax o user:16,cmd | grep user | grep php | awk '{print $1}' | sort | uniq -c | sort -nr | head -n 5
-echo "---"
 }
 
 echo "This script developed to analyse top sites by requests in a timestamp, and top ips by requests toward the site, resources load"
 req
 st
-echo "Results file - /tmp/$reqf"
