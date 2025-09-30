@@ -45,11 +45,13 @@ st () {
 }
 
 php () {
+echo "---"
 echo "PHP: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php)"
 echo "php-cgi: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php-cgi)"
 echo "lsphp: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c lsphp)"
 echo "Top 5 users:"
 ps ax o user:16,cmd | grep user | grep php | awk '{print $1}' | sort | uniq -c | sort -nr | head -n 5
+echo "---"
 }
 
 echo "This script developed to analyse top sites by requests in a timestamp, and top ips by requests toward the site, resources load"
