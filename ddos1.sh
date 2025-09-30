@@ -21,6 +21,7 @@ st () {
     echo "Time search (like 10: or 12:1)"
     echo "[D/d] docker stats"
     echo "[H/h] apache/nginx total requests and memory"
+    echo "[P/p] php users' process count"
     echo "[RESTRICT/UNRESTRICT] by Belarus zone"
     echo "[Q/q] for quit"
     read -p "Enter the search key: " tm
@@ -28,9 +29,10 @@ st () {
     case $tm in
 	"q"|"Q") exit 0;;
 	"d"|"D") docker stats --no-stream; st;;
+	"h"|"H") service httpd status | grep "Total\|Memory"; service nginx status | grep "Tasks\|Memory";st;;
+    "p"|"P") php | tee -a  /tmp/$reqf; st;;
 	"RESTRICT") sed -i "s/#include belips_restrict.conf;/include belips_restrict.conf;/" /etc/nginx/tuning.conf;nginx -t && nginx -s reload; st;;
 	"UNRESTRICT") sed -i "s/include belips_restrict.conf;/#include belips_restrict.conf;/" /etc/nginx/tuning.conf; nginx -t && nginx -s reload; st;;
-	"h"|"H") service httpd status | grep "Total\|Memory"; service nginx status | grep "Tasks\|Memory";st;;
 	*)
 	echo "------ at $tm ------" >> /tmp/$reqf
     	cat  /var/www/httpd-logs/$site | grep "$tm" |awk '{print$1}' | sort -n | uniq -c | sort -nr | head -n $tip > ips.tmp
@@ -42,7 +44,15 @@ st () {
     esac
 }
 
-echo "This script developed to analyse top sites by requests in a timestamp, and top ips by requests toward the site"
+php () {
+echo "PHP: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php)"
+echo "php-cgi: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php-cgi)"
+echo "lsphp: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c lsphp)"
+echo "Top 5 users:"
+ps ax o user:16,cmd | grep user | grep php | awk '{print $1}' | sort | uniq -c | sort -nr | head -n 5
+}
+
+echo "This script developed to analyse top sites by requests in a timestamp, and top ips by requests toward the site, resources load"
 req
 st
 echo "Results file - /tmp/$reqf"
