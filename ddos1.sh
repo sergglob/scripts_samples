@@ -1,0 +1,48 @@
+#!/bin/bash
+#Developed by Sergey Novikov
+#Script for searching possible DDoS in current/today logs on SVH
+req () {
+    read -p "Enter the time mark for search (like 9:22): " tm
+    reqf="req_$(date +"%H-%M-%S_%d%m%y").txt"
+    echo "__________________________________________________________________________________________" > /tmp/$reqf
+    for i in $(ls /var/www/httpd-logs/| grep access);do echo $i; grep "$tm" /var/www/httpd-logs/$i| wc -l;done >> sites.tmp
+    sed -i ':a;N;$!ba;s/.log\n/.log /g' sites.tmp
+    hd="10" #top search results == 10
+    cat sites.tmp | sort -k2 -nr | head -n $hd  | tee -a /tmp/$reqf
+    echo "__________________________________________________________________________________________" >> /tmp/$reqf
+    rm sites.tmp
+    echo ""
+    echo "#######################################"
+    read -p "Enter the site log name: " site
+    echo "#######################################"
+    echo "##### $site #####" >> /tmp/$reqf
+}
+st () {
+    echo "Time search (like 10: or 12:1)"
+    echo "[D/d] docker stats"
+    echo "[H/h] apache/nginx total requests and memory"
+    echo "[RESTRICT/UNRESTRICT] by Belarus zone"
+    echo "[Q/q] for quit"
+    read -p "Enter the search key: " tm
+    tip="10"    #Number of the TOP IPs access site == 10
+    case $tm in
+	"q"|"Q") exit 0;;
+	"d"|"D") docker stats --no-stream; st;;
+	"RESTRICT") sed -i "s/#include belips_restrict.conf;/include belips_restrict.conf;/" /etc/nginx/tuning.conf;nginx -t && nginx -s reload; st;;
+	"UNRESTRICT") sed -i "s/include belips_restrict.conf;/#include belips_restrict.conf;/" /etc/nginx/tuning.conf; nginx -t && nginx -s reload; st;;
+	"h"|"H") service httpd status | grep "Total\|Memory"; service nginx status | grep "Tasks\|Memory";st;;
+	*)
+	echo "------ at $tm ------" >> /tmp/$reqf
+    	cat  /var/www/httpd-logs/$site | grep "$tm" |awk '{print$1}' | sort -n | uniq -c | sort -nr | head -n $tip > ips.tmp
+    	cat ips.tmp | tee -a /tmp/$reqf
+    	rm ips.tmp
+	echo "----------------------------------------------"
+	echo "Report results: /tmp/$reqf"
+	st
+    esac
+}
+
+echo "This script developed to analyse top sites by requests in a timestamp, and top ips by requests toward the site"
+req
+st
+echo "Results file - /tmp/$reqf"
