@@ -22,16 +22,18 @@ st () {
     echo "Time search (like 10: or 12:1)"
     echo "[D/d] docker stats"
     echo "[H/h] apache/nginx total requests and memory"
-    echo "[P/p] php users' process count"
+    echo "[P/p] php users' process count and list"
+    echo "[K/k] kill user process"
     echo "[RESTRICT/UNRESTRICT] by Belarus zone"
     echo "[Q/q] for quit"
-    read -p "Enter the search key: " tm
+    read -p "__________________________Enter the search key: " tm
     tip="10"    #Number of the TOP IPs access site == 10
     case $tm in
 	"q"|"Q") echo "Results file - /tmp/$reqf"; exit 0;;
 	"d"|"D") docker stats --no-stream | tee -a /tmp/$reqf; st;;
 	"h"|"H") proxy | tee -a /tmp/$reqf;st;;
-    "p"|"P") php | tee -a  /tmp/$reqf; st;;
+        "p"|"P") php | tee -a  /tmp/$reqf; st;;
+	"k"|"k") kill;st;;
 	"RESTRICT") sed -i "s/#include belips_restrict.conf;/include belips_restrict.conf;/" /etc/nginx/tuning.conf;nginx -t && nginx -s reload; st;;
 	"UNRESTRICT") sed -i "s/include belips_restrict.conf;/#include belips_restrict.conf;/" /etc/nginx/tuning.conf; nginx -t && nginx -s reload; st;;
 	*)
@@ -58,6 +60,16 @@ echo "php-cgi: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php-cgi
 echo "lsphp: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c lsphp)"
 echo "Top 5 users:"
 ps ax o user:16,cmd | grep user | grep php | awk '{print $1}' | sort | uniq -c | sort -nr | head -n 5
+echo "----------------------------------------------------------------------------------"
+mytop -b	#show mytop utility process list
+}
+
+kill () {
+	read -p "__________________________Enter the user to kill, [Q/q] to abort: " kl
+	case $kl in
+	"q"|"Q") st;;
+	*) for proc in $(mysql -e "show processlist;" | grep $kl | awk '{print$1}' | tail -n 1);do mysql -e "kill $proc;"; echo "$kl: killed proc $proc" | tee -a /tmp/$reqf; done;st;;
+	esac
 }
 
 echo "This script developed to analyse top sites by requests in a timestamp, and top ips by requests toward the site, resources load"
