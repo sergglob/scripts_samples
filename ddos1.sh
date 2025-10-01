@@ -68,7 +68,7 @@ kill () {
 	read -p "__________________________Enter the user to kill, [Q/q] to abort: " kl
 	case $kl in
 	"q"|"Q") st;;
-	*) for proc in $(mysql -e "show processlist;" | grep $kl | awk '{print$1}' | tail -n 1);do mysql -e "kill $proc;"; echo "$kl: killed proc $proc" | tee -a /tmp/$reqf; done;st;;
+	*) for proc in $(mysql -e "show processlist;" | grep $kl | awk '{print$1}');do mysql -e "kill $proc;"; echo "$kl: killed proc $proc" | tee -a /tmp/$reqf; done;st;;
 	esac
 }
 
