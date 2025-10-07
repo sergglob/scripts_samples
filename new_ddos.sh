@@ -64,7 +64,7 @@ st () {
     echo "[D/d] docker stats"
     echo "[H/h] apache/nginx total requests and memory"
     echo "[P/p] php users' process count and list"
-    echo "[K/k] kill mysql user process"
+    echo "[K/k] kill native mysql user process"
     echo "[RESTRICT/UNRESTRICT] by Belarus zone"
     echo "[Q/q] for quit"
     read -p "__________________________Enter the search key: " tm
@@ -88,6 +88,11 @@ echo "--- httpd:"
 service httpd status | grep "Total\|Memory"
 echo "--- nginx:"
 service nginx status | grep "Tasks\|Memory"
+read -p "Restart apache/nginx? [Yes], any other key back to menu: " ch
+case ch in
+	"Yes") service httpd restart && service nginx restart;;
+	*) exit 0;;
+esac
 }
 
 php () {
@@ -100,9 +105,11 @@ echo "--------------------------------------- mytop ----------------------------
 mytop -b | grep user | awk '{print$3}' |sort | uniq -c | sort -nr | head -n 5	#show mytop utility process list
 echo "--------------------------------------- db threads -------------------------------------------"
 echo "native:: $(mysql -s -e "SHOW STATUS LIKE 'Threads_connected';")"
+echo -e "native, top 3 users requests::\n$(mysql -e "show processlist;" | grep user | awk '{print $2}' | uniq -c | sort -nr | head -n 3)"
 for c in $(docker container ls | grep -v IMAGE | awk '{print$1}')
 do
     echo "$(docker container ls | grep $c | awk '{print$2}'):: $(docker exec -ti $c mysql -s -e "SHOW STATUS LIKE 'Threads_connected';" | grep -v Value)"
+    echo -e "$(docker container ls | grep $c | awk '{print$2}'), top 3 users requests::\n$(docker exec -ti $c mysql -s -e "show processlist;" | grep user | grep -v "system user" | awk '{print $2}' | uniq -c | sort -nr | head -n 3)"
 done
 }
 
