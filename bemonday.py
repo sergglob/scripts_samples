@@ -4,8 +4,6 @@ Done! Congratulations on your new bot. You will find it at t.me/bemonday_bot.
 Use this token to access the HTTP API:
 xxxx:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 '''
-#novikov_vm01 ext IP 185.32.226.191
-
 import telebot
 import ast
 import time
