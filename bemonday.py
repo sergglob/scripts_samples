@@ -2,7 +2,7 @@
 '''
 Done! Congratulations on your new bot. You will find it at t.me/bemonday_bot.
 Use this token to access the HTTP API:
-6753732347:AAFA0wsDWOA228eC2nCY5zVydHpe9eyj3YA
+xxxx:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 '''
 #novikov_vm01 ext IP 185.32.226.191
 
@@ -12,7 +12,7 @@ import time
 from telebot import types
 from datetime import date
 
-bot = telebot.TeleBot("6753732347:AAFA0wsDWOA228eC2nCY5zVydHpe9eyj3YA")
+bot = telebot.TeleBot("xxxx:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
 today = date.today()
 
 stringList = {
