@@ -321,6 +321,10 @@ echo "${GR}7) Checking rsyslog service status and errors ${NO}"
 echo "${YE}(omfwd: error can be ignored / autofix in a minute, log file access forbidden - chmod 664 for log files and restart rsyslog)${NO}"
 echo "${YE}PAY ATTENTION on service running time to be sure it was restarted${NO}"
 echo "${YE}on Ubuntu + ISP manager you can also try to add syslog to ISP user's sites group':  usermod -a -G <site_user_group> syslog${NO}"
+echo "${YE}on Ubuntu + ISP manager if still rsyslog access log file permittion denied, check and add APPARMOR':  nano /etc/apparmor.d/usr.sbin.rsyslogd
+/var/www/httpd-logs/          r,
+/var/www/httpd-logs/**        r,
+${NO}"
 echo "-----"
 sleep 3
 service rsyslog restart
