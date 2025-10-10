@@ -98,7 +98,7 @@ else
     echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers || true
 
     #ubuntu/debian
-    sudo useradd -m -G sudo,root -s /bin/bash issp || true
+    useradd -m -G sudo,root -s /bin/bash issp || true
     echo "${BL}Adding ISSP user into sudo group${NO}"
     sed -i 's/^%sudo/#&/' /etc/sudoers || true
     echo '%sudo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers || true
