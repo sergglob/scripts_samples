@@ -2,11 +2,9 @@
 #Developed by Sergey Novikov
 #Script for searching possible DDoS in current/today logs on SVH
 req () {
-#    read -p "Enter the time mark for search (like 9:22): " tm
     tm=$(date +%H:%m)
-#    reqf="req_$(date +"%H-%M-%S_%d%m%y").txt"
     sitesf="sites_$(date +"%H-%M-%S_%d%m%y").txt"
-    echo "__________________________________________________________________________________________" | tee -a /tmp/$reqf /tmp/$sitesf
+    echo "________________________________________ $(date) ________________________________________" | tee -a /tmp/$reqf /tmp/$sitesf
     for i in $(ls /var/www/httpd-logs/| grep access);do echo $i; grep "$tm" /var/www/httpd-logs/$i| wc -l;done >> sites.tmp
     sed -i ':a;N;$!ba;s/.log\n/.log /g' sites.tmp
     hd="10" #top search results == 10
@@ -16,10 +14,21 @@ req () {
     echo "" | tee -a /tmp/$reqf
 }
 
+req1 () {
+    tm=$(date +%H:%m)
+    sitesf="sites_$(date +"%H-%M-%S_%d%m%y").txt"
+    echo "________________________________________ $(date) ________________________________________"
+    for i in $(ls /var/www/httpd-logs/| grep access);do echo $i; grep "$tm" /var/www/httpd-logs/$i| wc -l;done >> sites.tmp
+    sed -i ':a;N;$!ba;s/.log\n/.log /g' sites.tmp
+    hd="10"
+    cat sites.tmp | sort -k2 -nr | head -n $hd
+    echo "__________________________________________________________________________________________"
+    rm sites.tmp
+    echo ""
+}
+
 crec () {	#custom time ddos search
     read -p "Enter the time mark for search (like 9:22): " tm
-#    tm=$(date +%H:%m)
-#    reqf="req_$(date +"%H-%M-%S_%d%m%y").txt"
     sitesf="sites_$(date +"%H-%M-%S_%d%m%y").txt"
     echo "__________________________________________________________________________________________" | tee -a /tmp/$reqf /tmp/$sitesf
     for i in $(ls /var/www/httpd-logs/| grep access);do echo $i; grep "$tm" /var/www/httpd-logs/$i| wc -l;done >> sites.tmp
@@ -95,7 +104,16 @@ case ch in
 esac
 }
 
+proxy1 () {
+echo "--- httpd:"
+service httpd status | grep "Total\|Memory"
+echo "--- nginx:"
+service nginx status | grep "Tasks\|Memory"
+}
+
+
 php () {
+echo "--------------------------------------- php -------------------------------------------"
 echo "PHP: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php)"
 echo "php-cgi: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c php-cgi)"
 echo "lsphp: $(ps ax o user:16,pid,pcpu,pmem,cmd | grep user | grep -c lsphp)"
@@ -121,8 +139,17 @@ kill () {
 	esac
 }
 
+summ () {
+	req1
+	proxy1
+	php
+	echo "--------------------------------------- Docker -------------------------------------------"
+	docker stats --no-stream
+}
+
 echo "POSSIBLE DDOS CHECK"
 echo "This script developed to analyse top sites by requests in a timestamp, and top ips by requests toward the site, resources load"
-reqf="req_$(date +"%H-%M-%S_%d%m%y").txt"
+reqf="req_$(date +"%d%m%y_%H-%M-%S").txt"
+summ >> /tmp/$reqf
 req
 st
