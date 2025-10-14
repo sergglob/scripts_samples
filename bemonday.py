@@ -14,23 +14,23 @@ bot = telebot.TeleBot("xxxx:yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
 today = date.today()
 
 stringList = {
-        "1": "Бобрик Наталья \U0001F9AB",       #beaver
-        "2": "Бутько Павел \U0001F4E3",         #megaphone
-        "3": "Вакуленчик Андрей \U0001F4F8",    #camera
-        "4": "Ворошкевич Игорь \U0001F57A",     #man dance
-        "5": "Герасимчик Дмитрий \u2620",       #skull vs bones
-        "6": "Зизеко Юрий \U0001F61E",          #disappointed face
-        "7": "Карасёв Дмитрий \U0001F41F",      #fish
-        "8": "Клепча Дмитрий \U0001F4BB",       #computer
-        "9": "Короткевич Константин \U0001F640",#screaming cat
-        "10": "Кособука Александр \u24E5",       #v logo
-        "11": "Лазуко Дмитрий \U0001F34F",      #green apple
-        "12": "Медведь Дмитрий \U0001F9F8",     #teddy bear
-        "13": "Нелюб Иван \U0001F91F",          #Ilove hand sign
-        "14": "Новиков Сергей \U0001F525",      #fire
-        "15": "Сидоров Андрей \U0001F454",      #nekite
-        "16": "Фукс Виталий \U0001F98A",        #fox
-        "17": "ГЭСИО \u2694"                    #cross swords
+        "1": "Наталья \U0001F9AB",       #beaver
+        "2": "Павел \U0001F4E3",         #megaphone
+        "3": "Андрей \U0001F4F8",    #camera
+        "4": "Игорь \U0001F57A",     #man dance
+        "5": "Дмитрий \u2620",       #skull vs bones
+        "6": "Юрий \U0001F61E",          #disappointed face
+        "7": "Дмитрий \U0001F41F",      #fish
+        "8": "Дмитрий \U0001F4BB",       #computer
+        "9": "Константин \U0001F640",#screaming cat
+        "10": "Александр \u24E5",       #v logo
+        "11": "Дмитрий \U0001F34F",      #green apple
+        "12": "Дмитрий \U0001F9F8",     #teddy bear
+        "13": "Иван \U0001F91F",          #Ilove hand sign
+        "14": "Сергей \U0001F525",      #fire
+        "15": "Андрей \U0001F454",      #nekite
+        "16": "Виталий \U0001F98A",        #fox
+        "17": "О \u2694"                    #cross swords
 }
 
 #\U0001F480 skull
