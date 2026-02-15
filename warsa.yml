@@ -17,7 +17,7 @@
     shell: |
       echo "----------------------------------------------- $(date) -----------------------------------------------" >> /home/WARSA/warsa.log
       cd /home/WARSA/
-      ./warsa -dir / | tee -a /home/WARSA/warsa.log
+      systemd-run --scope --user -p CPUQuota=400% -p MemoryMax=4096M -p IOWeight=6 ./warsa -dir / -risk 14 | tee -a warsa_risk_$(hostname -s).txt
       echo "----------------------------------------------- $(date) -----------------------------------------------" >> /home/WARSA/warsa.log
 
   - name: Get the log from server
